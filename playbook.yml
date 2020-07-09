@@ -1,0 +1,22 @@
+- name: server
+  hosts: all
+  become: True
+  vars:
+    user_name: application_user
+    server_port: 5000
+  tasks:
+    - name: create user
+      user:
+        name: "{{ user_name }}"
+        groups: users
+        shell: /bin/bash
+
+    - template:
+        src: files/simplehttp.service.j2
+        dest: /etc/systemd/system/simplehttp.service
+
+    - name: Make sure a service is running
+      systemd:
+        state: started
+        name: simplehttp
+        daemon_reload: true
